@@ -10,11 +10,29 @@
 <img src="https://joyplot.com/documents/wp-content/uploads/2016/08/dice.png" align="right">
   <form method="post" action="/">
     <div>人数を入力して、ボタンをクリックしてください。</div>
-    <input name = "textbox1" type = "text" /><br/>
-    <input name = "textbox2" type = "text" /><br/>
-    <input type="submit" />
+    <div>クラス</div><input name = "number" id = "number" type = "number" value="1" min="1" max="100" step="1" /><br/>
+    <div>人数</div><input name = "number2" id = "number2" type = "number" value="40" min="0" max="100" step="1" /><br/>
+<style>
+.example2{
+    width: 50%;
+    min-width: 200px;
+    max-width: 600px;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #68779a;
+    background: #cbe8fa;
+    cursor: pointer;
+}
+</style>
+<input type="submit" value="抽選開始！" class="example2">
   </form>
   <hr/>
 <div><p v-html="output_message"></p></div>
 </body>
+<script>
+    localStorage.setItem('myCat', number);
+    var cat = localStorage.getItem("myCat");
+    localStorage.setItem('myCat2', number2);
+    var cat2 = localStorage.getItem("myCat2");
+</script>
 </html>
