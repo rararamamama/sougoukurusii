@@ -1,9 +1,12 @@
+<!-- 事前のhtmlの設定やwebsiteの公開を行うためのプログラム -->
 <!DOCTYPE html>
-
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<meta charset="utf-8" />
+
+    
+<!-- 画面に文字などを表示させるプログラム -->
 <head>
-    <meta charset="utf-8" />
-    <title></title>
+<title>sougou de ryuunen</title>
 </head>
 <body>
   <h1>sougou turaiii</h1>
@@ -29,10 +32,21 @@
   <hr/>
 <div><p v-html="output_message"></p></div>
 </body>
+
+    <!-- javascriptを使ったデータの保存 -->
 <script>
     localStorage.setItem('myCat', number);
     var cat = localStorage.getItem("myCat");
     localStorage.setItem('myCat2', number2);
     var cat2 = localStorage.getItem("myCat2");
+
+    let reloadCount = sessionStorage.getItem('reloadCount');
+    if (reloadCount === null) {
+      reloadCount = 1;
+    } else {
+      reloadCount = parseInt(reloadCount) + 1;
+    }
+    sessionStorage.setItem('reloadCount', reloadCount);
 </script>
+    
 </html>
