@@ -29,8 +29,7 @@
 
 <h1>学年・クラス抽選</h1>
 
-<form action="/" method="post">
-
+<form action="" method="post">
     学年：
     <input name="grade" type="number" value="1" min="1" max="6"><br>
 
@@ -55,14 +54,14 @@ window.onload = () => {
     const resultEl = document.getElementById("result");
     if (!resultEl) return;
 
-    const resultText = resultEl.innerText;  // Python結果: ex) "結果: 1年2組 18番"
+    const resultText = resultEl.innerText;
     const match = resultText.match(/(\d+)番/);
     if (!match) return;
     const finalNumber = parseInt(match[1], 10);
 
     const rouletteEl = document.getElementById("roulette");
     let current = 1;
-    let max = 100;  // ざっくり回転させる用（実人数と違ってOK）
+    let max = 100;
 
     rouletteEl.style.opacity = "1";
 
@@ -75,7 +74,7 @@ window.onload = () => {
     setTimeout(() => {
         clearInterval(interval);
         rouletteEl.innerText = finalNumber;
-        rouletteEl.style.color = "#c00"; // 最終結果を強調
+        rouletteEl.style.color = "#c00";
     }, 1500);
 };
 </script>
@@ -98,7 +97,9 @@ window.onload = () => {
 {% endif %}
 
 <hr>
-<a href="/reset_all">全ての履歴をリセットする</a>
+<form action="/reset_all" method="post">
+    <input type="submit" value="全ての履歴をリセット">
+</form>
 
 </body>
 </html>
