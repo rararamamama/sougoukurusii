@@ -14,7 +14,6 @@
     background: #cbe8fa;
     cursor: pointer;
 }
-
 #roulette {
     font-size: 48px;
     font-weight: bold;
@@ -31,7 +30,7 @@
 
 <img src="https://joyplot.com/documents/wp-content/uploads/2016/08/dice.png" align="right">
 
-<form action="" method="post">
+<form id="lotteryForm">
     学年：
     <input name="grade" type="number" value="1" min="1" max="6"><br>
 
@@ -41,67 +40,104 @@
     人数：
     <input name="number2" type="number" value="40" min="1" max="100"><br>
 
-    <input type="submit" value="抽選開始！" class="example2">
+    <button type="submit" class="example2">抽選開始！</button>
 </form>
 
 <hr>
 
-{% if output_message %}
-<p style="display:none;" id="result">{{ output_message }}</p>
 <div id="roulette"></div>
-{% endif %}
+<p id="result"></p>
+
+<hr>
+
+<h3>抽選履歴（全学年クラス）</h3>
+<div id="history"></div>
+
+<hr>
+<button onclick="resetAll()">全ての履歴をリセット</button>
 
 <script>
-window.onload = () => {
-    const resultEl = document.getElementById("result");
-    if (!resultEl) return;
+function loadHistory() {
+    const historyDiv = document.getElementById("history");
+    historyDiv.innerHTML = "";
+    const data = JSON.parse(localStorage.getItem("history") || "{}");
 
-    const resultText = resultEl.innerText;
-    const match = resultText.match(/(\d+)番/);
-    if (!match) return;
-    const finalNumber = parseInt(match[1], 10);
+    const keys = Object.keys(data);
+    if (keys.length === 0) {
+        historyDiv.innerHTML = "<p>まだ履歴がありません</p>";
+        return;
+    }
+
+    keys.forEach(key => {
+        const h = document.createElement("h4");
+        h.innerText = `${key}組`;
+        historyDiv.appendChild(h);
+
+        const ul = document.createElement("ul");
+        data[key].forEach(num => {
+            const li = document.createElement("li");
+            li.innerText = `${num}番`;
+            ul.appendChild(li);
+        });
+        historyDiv.appendChild(ul);
+    });
+}
+
+function resetAll() {
+    localStorage.removeItem("history");
+    loadHistory();
+    alert("全履歴を削除しました！");
+}
+
+// 抽選処理
+document.getElementById("lotteryForm").addEventListener("submit", e => {
+    e.preventDefault();
+
+    const form = new FormData(e.target);
+    const grade = form.get("grade");
+    const classroom = form.get("classroom");
+    const number2 = parseInt(form.get("number2"), 10);
+
+    const key = `${grade}-${classroom}`;
+    const data = JSON.parse(localStorage.getItem("history") || "{}");
+
+    if (!data[key]) data[key] = [];
+
+    const allNumbers = [...Array(number2)].map((_, i) => i + 1);
+    const used = data[key];
+    const remain = allNumbers.filter(n => !used.includes(n));
+
+    if (remain.length === 0) {
+        alert(`${grade}年${classroom}組は全て抽選済みです！`);
+        return;
+    }
+
+    const selected = remain[Math.floor(Math.random() * remain.length)];
+    used.push(selected);
+    data[key] = used;
+    localStorage.setItem("history", JSON.stringify(data));
 
     const rouletteEl = document.getElementById("roulette");
-    let current = 1;
-    let max = 100;
+    const resultEl = document.getElementById("result");
 
+    let current = 1;
     rouletteEl.style.opacity = "1";
 
     const interval = setInterval(() => {
-        current++;
-        if (current > max) current = 1;
+        current = (current % number2) + 1;
         rouletteEl.innerText = current;
     }, 50);
 
     setTimeout(() => {
         clearInterval(interval);
-        rouletteEl.innerText = finalNumber;
+        rouletteEl.innerText = selected;
         rouletteEl.style.color = "#c00";
+        resultEl.innerText = `結果: ${grade}年${classroom}組 ${selected}番`;
+        loadHistory();
     }, 1500);
-};
+});
+
+loadHistory();
 </script>
-
-<hr>
-
-<h3>抽選履歴（全学年クラス）</h3>
-
-{% if history %}
-{% for key, numbers in history.items() %}
-<h4>{{ key }}組</h4>
-<ul>
-    {% for n in numbers %}
-    <li>{{ n }}番</li>
-    {% endfor %}
-</ul>
-{% endfor %}
-{% else %}
-<p>まだ履歴がありません</p>
-{% endif %}
-
-<hr>
-<form action="/reset_all" method="post">
-    <input type="submit" value="全ての履歴をリセット">
-</form>
-
 </body>
 </html>
