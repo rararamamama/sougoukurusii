@@ -1,22 +1,10 @@
-<!-- 事前のhtmlの設定やwebsiteの設定を行うためのプログラムdeeeeeds -->
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<meta charset="utf-8" />
-
-    
-<!-- 画面に文字などを表示させるプログラム -->
+<html lang="ja">
 <head>
-<title>sougou de ryuunen</title>
-</head>
-<body>
-  <h1>sougou turaiii</h1>
-<img src="https://joyplot.com/documents/wp-content/uploads/2016/08/dice.png" align="right">
-  <form method="post">
-    <div>条件を入力して、ボタンをクリックしてください。</div>
-    <div>学年・クラス</div><input name = "number" id = "number" type = "number" value="1" min="1" max="40" step="1" /><br/>
-    <div>人数</div><input name = "number2" id = "number2" type = "number" value="40" min="0" max="100" step="1" /><br/>
+<meta charset="utf-8">
+<title>複数クラス対応抽選</title>
 <style>
-.example2{
+.example2 {
     width: 50%;
     min-width: 200px;
     max-width: 600px;
@@ -26,27 +14,91 @@
     background: #cbe8fa;
     cursor: pointer;
 }
+
+#roulette {
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
 </style>
-<input type="submit" value="抽選開始！" class="example2">
-  </form>
-  <hr/>
-<div><p v-html="output_message"></p></div>
-</body>
+</head>
+<body>
 
-    <!-- javascriptを使ったデータの保存 -->
+<h1>学年・クラス抽選</h1>
+
+<form action="/" method="post">
+
+    学年：
+    <input name="grade" type="number" value="1" min="1" max="6"><br>
+
+    クラス：
+    <input name="classroom" type="number" value="1" min="1" max="10"><br>
+
+    人数：
+    <input name="number2" type="number" value="40" min="1" max="100"><br>
+
+    <input type="submit" value="抽選開始！" class="example2">
+</form>
+
+<hr>
+
+{% if output_message %}
+<p style="display:none;" id="result">{{ output_message }}</p>
+<div id="roulette"></div>
+{% endif %}
+
 <script>
-    localStorage.setItem('myCat', number);
-    var cat = localStorage.getItem("myCat");
-    localStorage.setItem('myCat2', number2);
-    var cat2 = localStorage.getItem("myCat2");
+window.onload = () => {
+    const resultEl = document.getElementById("result");
+    if (!resultEl) return;
 
-    let reloadCount = sessionStorage.getItem('reloadCount');
-    if (reloadCount === null) {
-      reloadCount = 1;
-    } else {
-      reloadCount = parseInt(reloadCount) + 1;
-    }
-    sessionStorage.setItem('reloadCount', reloadCount);
+    const resultText = resultEl.innerText;  // Python結果: ex) "結果: 1年2組 18番"
+    const match = resultText.match(/(\d+)番/);
+    if (!match) return;
+    const finalNumber = parseInt(match[1], 10);
+
+    const rouletteEl = document.getElementById("roulette");
+    let current = 1;
+    let max = 100;  // ざっくり回転させる用（実人数と違ってOK）
+
+    rouletteEl.style.opacity = "1";
+
+    const interval = setInterval(() => {
+        current++;
+        if (current > max) current = 1;
+        rouletteEl.innerText = current;
+    }, 50);
+
+    setTimeout(() => {
+        clearInterval(interval);
+        rouletteEl.innerText = finalNumber;
+        rouletteEl.style.color = "#c00"; // 最終結果を強調
+    }, 1500);
+};
 </script>
-    
+
+<hr>
+
+<h3>抽選履歴（全学年クラス）</h3>
+
+{% if history %}
+{% for key, numbers in history.items() %}
+<h4>{{ key }}組</h4>
+<ul>
+    {% for n in numbers %}
+    <li>{{ n }}番</li>
+    {% endfor %}
+</ul>
+{% endfor %}
+{% else %}
+<p>まだ履歴がありません</p>
+{% endif %}
+
+<hr>
+<a href="/reset_all">全ての履歴をリセットする</a>
+
+</body>
 </html>
