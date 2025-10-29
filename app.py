@@ -35,7 +35,7 @@ def index():
 
     return render_template("index.html", output_message=output_message, history=history)
 
-@app.route('/reset_all', methods=['POST'])
+@app.route('/reset_all', methods=['GET', 'POST'])
 def reset_all():
     session.clear()
     return render_template("index.html", output_message="全履歴を削除しました！", history={})
