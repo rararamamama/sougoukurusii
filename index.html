@@ -1,8 +1,9 @@
+<!-- 事前のhtmlの設定やwebsiteの設定を行うためのプログラム -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>sougouyurusumaji</title>
+<title>sougou de ryuunen ˚‧º·(˚ ˃̣̣̥⌓˂̣̣̥ )‧º·˚</title>
 <style>
 .example2 {
     width: 50%;
@@ -24,18 +25,19 @@
 }
 </style>
 </head>
+
+<!-- 画面に文字などを表示させるプログラム -->
+    
 <body>
-
 <h1>sougouturaiiii</h1>
-
 <img src="https://joyplot.com/documents/wp-content/uploads/2016/08/dice.png" align="right">
 
 <form id="lotteryForm">
     学年：
-    <input name="grade" type="number" value="1" min="1" max="6"><br>
+    <input name="grade" type="number" value="1" min="1" max="10"><br>
 
     クラス：
-    <input name="classroom" type="number" value="1" min="1" max="10"><br>
+    <input name="classroom" type="number" value="1" min="1" max="50"><br>
 
     人数：
     <input name="number2" type="number" value="40" min="1" max="100"><br>
@@ -50,11 +52,13 @@
 
 <hr>
 
-<h3>抽選履歴（全学年クラス）</h3>
+<h3>抽選履歴</h3>
 <div id="history"></div>
 
 <hr>
 <button onclick="resetAll()">全ての履歴をリセット</button>
+
+<!-- javascriptによるデータの保存を行うプログラム -->
 
 <script>
 function loadHistory() {
@@ -89,7 +93,8 @@ function resetAll() {
     alert("全履歴を削除しました！");
 }
 
-// 抽選処理
+// javascriptによる抽選を行うプログラム
+    
 document.getElementById("lotteryForm").addEventListener("submit", e => {
     e.preventDefault();
 
@@ -108,7 +113,7 @@ document.getElementById("lotteryForm").addEventListener("submit", e => {
     const remain = allNumbers.filter(n => !used.includes(n));
 
     if (remain.length === 0) {
-        alert(`${grade}年${classroom}組は全て抽選済みです！`);
+        alert(`${grade}年${classroom}組はデータがいっぱいいっぱいです！`);
         return;
     }
 
