@@ -1,3 +1,4 @@
+<!-- 事前のhtmlの設定やwebsiteの設定を行うためのプログラム -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -44,6 +45,8 @@ select,input[type=number],input[type=text]{padding:8px;border-radius:8px;border:
 .note{font-size:13px;color:var(--muted)}
 </style>
 </head>
+
+<!-- 画面に文字などを表示させるプログラム -->
 <body>
 <div class="container">
   <div class="header">
@@ -127,6 +130,7 @@ select,input[type=number],input[type=text]{padding:8px;border-radius:8px;border:
   </div>
 </div>
 
+<!--javascriptで指名やデータの保存を行うプログラム-->
 <script>
 const MAX_GRADE = 10;
 const MAX_CLASS = 50;
@@ -326,3 +330,4 @@ window.addEventListener('storage',()=>{populateClass();renderHistory();});
 </body>
 </html>
 
+<!-- おわり -->
