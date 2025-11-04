@@ -124,13 +124,13 @@ select,input[type=number],input[type=text]{padding:8px;border-radius:8px;border:
 
   <div class="history-wrap">
     <div class="card history" id="historyPanel">
-      <h3 style="margin-top:0">抽選履歴（日付順）</h3>
+      <h3 style="margin-top:0">指名履歴</h3>
       <div id="history"></div>
     </div>
 
     <div class="card" style="width:320px">
       <h4 style="margin-top:0">操作ヘルプ</h4>
-      <p class="small">・「戻す」は選択中の学年・クラスの最新1件の抽選結果を取り消します。</p>
+      <p class="small">・「戻す」は選択中の学年・クラスの最新1件の指名結果を取り消します。</p>
       <p class="small">・高確率指名設定を行うと指定した番号が指定した倍率だけ当たりやすくなります。また、カンマ｢,｣で区切ると複数の番号を指定できます。</p>
     </div>
   </div>
@@ -139,7 +139,7 @@ select,input[type=number],input[type=text]{padding:8px;border-radius:8px;border:
 
 
   
-<!------------------------------------javascriptで指名やデータの保存を行うプログラム---------------------------------------------->
+<!-----------------javascriptで指名やデータの保存、高確率抽選の設定等を行うプログラム---------------------------------------------->
 <script>
 const MAX_GRADE = 10;
 const MAX_CLASS = 50;
@@ -242,7 +242,7 @@ function pickRandomNumber(grade,classroom,limit){
   if(remain.length===0){
     data.current[key]=[];
     writeData(data);
-    showMessage(`処理中`);
+    showMessage(`処理中・・・`);
     return null;
   }
 
@@ -288,7 +288,7 @@ document.getElementById('lotteryForm').addEventListener('submit',e=>{
   e.preventDefault();
   const g=gradeSelect.value,c=classSelect.value,n=Number(numberInput.value)||40;
   if(!g||!c) return alert('学年・クラスを選択してください');
-  if(n<1||n>MAX_NUMBER) return alert('人数範囲エラー');
+  if(n<1||n>MAX_NUMBER) return alert('人数範囲エラー （´・ω・`）');
 
   clearInterval(spinInterval);clearTimeout(spinTimeout);
   let cur=1;
@@ -310,8 +310,8 @@ document.getElementById('undoBtn').addEventListener('click',()=>{
   const g=gradeSelect.value,c=classSelect.value;
   if(!g||!c) return alert('学年・クラスを選択');
   const key=`${g}-${c}`,num=undoLatestFor(key);
-  if(num===false) return alert('戻せる履歴がありません');
-  showMessage(`${num}番を戻しました`); renderHistory();
+  if(num===false) return alert('戻せる履歴がありません (˚ ˃̣̣̥⌓˂̣̣̥ )');
+  showMessage(`${num}番の指名を取り消しました！`); renderHistory();
 });
 document.getElementById('resetClassBtn').addEventListener('click',()=>{
   const g=gradeSelect.value,c=classSelect.value;
@@ -321,12 +321,12 @@ document.getElementById('resetClassBtn').addEventListener('click',()=>{
   if(data.dates) Object.keys(data.dates).forEach(d=>{if(data.dates[d][key]) delete data.dates[d][key];if(Object.keys(data.dates[d]||{}).length===0) delete data.dates[d];});
   if(data.current&&data.current[key]) delete data.current[key];
   if(data.undos) data.undos=data.undos.filter(u=>u.key!==key);
-  writeData(data);showMessage('削除しました');renderHistory();populateClass();
+  writeData(data);showMessage('削除しました！');renderHistory();populateClass();
 });
 document.getElementById('resetAllBtn').addEventListener('click',()=>{
   if(!confirm('全履歴を削除しますか？')) return;
   localStorage.removeItem(STORAGE_KEY);
-  showMessage('全履歴を削除しました');
+  showMessage('全履歴を削除しました！');
   renderHistory();populateClass();
 });
 onlyHistoryCheckbox.addEventListener('change',()=>populateClass());
@@ -340,4 +340,4 @@ window.addEventListener('storage',()=>{populateClass();renderHistory();});
 </html>
 
 
-<!-- おわり -->
+<!------------------------------------ おわり！ -------------------------------------------------->
