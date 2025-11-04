@@ -1,148 +1,328 @@
-<!-- 事前のhtmlの設定やwebsiteの設定を行うためのプログラム -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<title>sougou de ryuunen ˚‧º·(˚ ˃̣̣̥⌓˂̣̣̥ )‧º·˚</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>指名ツール — シンプルUI</title>
 <style>
-.example2 {
-    width: 50%;
-    min-width: 200px;
-    max-width: 600px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 1px solid #68779a;
-    background: #cbe8fa;
-    cursor: pointer;
+:root{
+  --bg:#f6f9fc;
+  --card:#ffffff;
+  --accent:#3b7dd8;
+  --muted:#6b7280;
+  --danger:#c64747;
 }
-#roulette {
-    font-size: 48px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 20px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;margin:16px;background:var(--bg);color:#111}
+.container{max-width:980px;margin:0 auto}
+.header{display:flex;align-items:center;gap:12px}
+.logo{width:58px;height:58px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#5aa0ff);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+h1{font-size:20px;margin:0}
+.card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(17,24,39,0.06);margin-top:12px}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end}
+.form-row{display:flex;flex-direction:column}
+label{font-size:13px;color:var(--muted);margin-bottom:6px}
+select,input[type=number],input[type=text]{padding:8px;border-radius:8px;border:1px solid #d1d5db;background:transparent}
+.btn{padding:10px 12px;border-radius:10px;border:0;background:var(--accent);color:#fff;font-weight:600;cursor:pointer}
+.btn-secondary{background:#eef6ff;color:var(--accent);border:1px solid #d7e8ff}
+.small{font-size:13px;color:var(--muted)}
+.controls{display:flex;gap:8px;align-items:center}
+#roulette{font-size:56px;font-weight:800;text-align:center;margin:24px 0;min-height:72px}
+#result{font-size:16px;text-align:center;margin-bottom:8px}
+.history-wrap{display:flex;gap:12px}
+.history{flex:1;min-width:260px}
+.panel{padding:12px;border-radius:8px;background:#fbfdff;border:1px solid #eef3ff}
+.date-group{margin-bottom:10px}
+.date-header{display:flex;justify-content:space-between;align-items:center}
+.date-title{font-weight:700}
+.class-list{margin-top:8px}
+.class-item{padding:6px;border-radius:6px;background:#fff;border:1px solid #f1f5f9;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.tag{font-size:13px;padding:4px 6px;border-radius:6px;background:#f1f5f9}
+.meta{font-size:13px;color:var(--muted)}
+.footer{margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:space-between}
+.toast{padding:8px 10px;border-radius:8px;background:#0ea5a0;color:#fff;display:inline-block}
+.note{font-size:13px;color:var(--muted)}
 </style>
 </head>
-
-<!-- 画面に文字などを表示させるプログラム -->
-    
 <body>
-<h1>sougouturaiiii</h1>
-<img src="https://joyplot.com/documents/wp-content/uploads/2016/08/dice.png" align="right">
+<div class="container">
+  <div class="header">
+    <div class="logo">(*^ω^*)</div>
+    <div>
+      <h1>学級抽選ツール</h1>
+      <div class="small"></div>
+    </div>
+  </div>
 
-<form id="lotteryForm">
-    学年：
-    <input name="grade" type="number" value="1" min="1" max="10"><br>
+  <div class="card">
+    <form id="lotteryForm">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>学年</label>
+          <select id="gradeSelect"></select>
+        </div>
 
-    クラス：
-    <input name="classroom" type="number" value="1" min="1" max="50"><br>
+        <div class="form-row">
+          <label>クラス</label>
+          <select id="classSelect"></select>
+        </div>
 
-    人数：
-    <input name="number2" type="number" value="40" min="1" max="100"><br>
+        <div class="form-row">
+          <label>人数（1〜200）</label>
+          <input id="numberInput" type="number" min="1" max="200" value="40">
+        </div>
 
-    <button type="submit" class="example2">抽選開始！</button>
-</form>
+        <div class="form-row">
+          <label>優先番号設定（カンマ区切り）</label>
+          <div class="controls" style="flex-direction:column;align-items:flex-start">
+            <input id="priorityNumberInput" type="text" placeholder="例: 1,5,10">
+            <select id="priorityRate">
+              <option value="1">倍率: 通常</option>
+              <option value="2">倍率: 2倍</option>
+              <option value="5">倍率: 5倍</option>
+              <option value="10">倍率: 10倍</option>
+            </select>
+          </div>
+        </div>
 
-<hr>
+        <div class="form-row">
+          <label></label>
+          <div class="controls">
+          <p hidden><label style="display:flex;align-items:center;gap:1px"><input id="onlyHistoryCheckbox" type="checkbox"> </label></p>
+          </div>
+        </div>
+      </div>
 
-<div id="roulette"></div>
-<p id="result"></p>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+        <button class="btn" type="submit">抽選開始！</button>
+        <button id="undoBtn" type="button" class="btn-secondary">戻す（最新1件）</button>
+        <button id="resetClassBtn" type="button" class="btn-secondary">このクラスの履歴をリセット</button>
+        <button id="resetAllBtn" type="button" class="btn-secondary">全ての履歴をリセット</button>
+      </div>
+    </form>
+<img src="https://joyplot.com/documents/wp-content/uploads/2016/08/dice.png"  width="100" height="100" align="right">
 
-<hr>
+    <div id="roulette" aria-live="polite"></div>
+    <div id="result" class="meta"></div>
 
-<h3>抽選履歴</h3>
-<div id="history"></div>
+    <div class="footer">
+      <div class="note"></div>
+      <div id="message" class="toast" style="display:none"></div>
+    </div>
+  </div>
 
-<hr>
-<button onclick="resetAll()">全ての履歴をリセット</button>
+  <div style="height:14px"></div>
 
-<!-- javascriptによるデータの保存を行うプログラム -->
+  <div class="history-wrap">
+    <div class="card history" id="historyPanel">
+      <h3 style="margin-top:0">抽選履歴（日付順）</h3>
+      <div id="history"></div>
+    </div>
+
+    <div class="card" style="width:320px">
+      <h4 style="margin-top:0">操作ヘルプ</h4>
+      <p class="small">・「戻す」は選択中の学年・クラスの最新1件を取り消します</p>
+      <p class="small">・優先番号設定を行うと指定した番号が当たりやすくなります</p>
+    </div>
+  </div>
+</div>
 
 <script>
-function loadHistory() {
-    const historyDiv = document.getElementById("history");
-    historyDiv.innerHTML = "";
-    const data = JSON.parse(localStorage.getItem("history") || "{}");
+const MAX_GRADE = 10;
+const MAX_CLASS = 50;
+const MAX_NUMBER = 200;
+const STORAGE_KEY = 'lottery_v2_data';
 
-    const keys = Object.keys(data);
-    if (keys.length === 0) {
-        historyDiv.innerHTML = "<p>まだ履歴がありません</p>";
-        return;
-    }
+function todayKey(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+function readData(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return {dates:{}, current:{}, undos:[]};
+  try{return JSON.parse(raw);}catch(e){return {dates:{}, current:{}, undos:[]};}
+}
+function writeData(data){ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }
 
-    keys.forEach(key => {
-        const h = document.createElement("h4");
-        h.innerText = `${key}組`;
-        historyDiv.appendChild(h);
+const gradeSelect = document.getElementById('gradeSelect');
+const classSelect = document.getElementById('classSelect');
+const numberInput = document.getElementById('numberInput');
+const onlyHistoryCheckbox = document.getElementById('onlyHistoryCheckbox');
+const historyDiv = document.getElementById('history');
+const rouletteEl = document.getElementById('roulette');
+const resultEl = document.getElementById('result');
+const messageEl = document.getElementById('message');
 
-        const ul = document.createElement("ul");
-        data[key].forEach(num => {
-            const li = document.createElement("li");
-            li.innerText = `${num}番`;
-            ul.appendChild(li);
-        });
-        historyDiv.appendChild(ul);
+function populateGrade(){
+  gradeSelect.innerHTML = '';
+  for(let g=1;g<=MAX_GRADE;g++){
+    const o=document.createElement('option');
+    o.value=g;o.textContent=g+'年';gradeSelect.appendChild(o);
+  }
+}
+function populateClass(){
+  const data=readData(), grade=gradeSelect.value, onlyHist=onlyHistoryCheckbox.checked;
+  classSelect.innerHTML='';
+  const add=(c)=>{const o=document.createElement('option');o.value=c;o.textContent=c+'組';classSelect.appendChild(o);};
+
+  if(onlyHist){
+    const keys=new Set();
+    Object.keys(data.dates||{}).forEach(date=>{
+      Object.keys(data.dates[date]||{}).forEach(k=>{
+        const[g,c]=k.split('-'); if(String(g)===String(grade)) keys.add(Number(c));
+      });
     });
+    if(keys.size===0){const o=document.createElement('option');o.textContent='（履歴なし）';o.disabled=true;classSelect.appendChild(o);return;}
+    Array.from(keys).sort((a,b)=>a-b).forEach(add);
+  }else{
+    for(let c=1;c<=MAX_CLASS;c++) add(c);
+  }
+}
+function renderHistory(){
+  const data=readData();
+  historyDiv.innerHTML='';
+  const dates=Object.keys(data.dates||{}).sort((a,b)=>b.localeCompare(a));
+  if(dates.length===0){historyDiv.innerHTML='<p class="meta">まだ履歴がありません</p>';return;}
+  dates.forEach(date=>{
+    const group=data.dates[date]||{};
+    const div=document.createElement('div');div.className='date-group panel';
+    const h=document.createElement('div');h.className='date-header';
+    const title=document.createElement('div');title.className='date-title';title.textContent=date;
+    const count=document.createElement('div');count.className='meta';
+    const tot=Object.values(group).reduce((s,a)=>s+(a?a.length:0),0);
+    count.textContent=tot+' 件';
+    h.appendChild(title);h.appendChild(count);div.appendChild(h);
+    const list=document.createElement('div');list.className='class-list';
+    Object.keys(group).sort().forEach(k=>{
+      const arr=group[k]||[],[g,c]=k.split('-');
+      const item=document.createElement('div');item.className='class-item';
+      const left=document.createElement('div');left.innerHTML=`<strong>${g}年 ${c}組</strong><div class="meta">${arr.length} 名</div>`;
+      const right=document.createElement('div');
+      const span=document.createElement('div');span.className='tag';span.textContent=arr.map(n=>n+'番').join('、')||'—';
+      right.appendChild(span);
+      item.appendChild(left);item.appendChild(right);list.appendChild(item);
+    });
+    div.appendChild(list);historyDiv.appendChild(div);
+  });
+}
+function showMessage(t,ms=1800){messageEl.textContent=t;messageEl.style.display='inline-block';setTimeout(()=>messageEl.style.display='none',ms);}
+
+function pickRandomNumber(grade,classroom,limit){
+  const key=`${grade}-${classroom}`,data=readData();
+  if(!data.current) data.current={};
+  if(!data.current[key]) data.current[key]=[];
+  const used=data.current[key];
+  const all=Array.from({length:limit},(_,i)=>i+1);
+  const remain=all.filter(n=>!used.includes(n));
+
+  const priorityText=document.getElementById('priorityNumberInput').value.trim();
+  const priorityRate=Number(document.getElementById('priorityRate').value);
+
+  if(priorityText && priorityRate>1){
+    const nums=priorityText.split(',').map(x=>Number(x.trim())).filter(x=>!isNaN(x)&&x>=1&&x<=limit);
+    nums.forEach(num=>{
+      if(!remain.includes(num)) remain.push(num);
+      for(let i=1;i<priorityRate;i++) remain.push(num);
+    });
+  }
+
+  if(remain.length===0){
+    data.current[key]=[];
+    writeData(data);
+    showMessage(`処理中`);
+    return null;
+  }
+
+  const selected=remain[Math.floor(Math.random()*remain.length)];
+  data.current[key].push(selected);
+  const date=todayKey();
+  if(!data.dates) data.dates={};
+  if(!data.dates[date]) data.dates[date]={};
+  if(!data.dates[date][key]) data.dates[date][key]=[];
+  data.dates[date][key].push(selected);
+  if(!data.undos) data.undos=[];
+  data.undos.push({date,key,number:selected});
+  writeData(data);
+  return selected;
 }
 
-function resetAll() {
-    localStorage.removeItem("history");
-    loadHistory();
-    alert("全履歴を削除しました！");
-}
-
-// javascriptによる抽選を行うプログラム
-    
-document.getElementById("lotteryForm").addEventListener("submit", e => {
-    e.preventDefault();
-
-    const form = new FormData(e.target);
-    const grade = form.get("grade");
-    const classroom = form.get("classroom");
-    const number2 = parseInt(form.get("number2"), 10);
-
-    const key = `${grade}-${classroom}`;
-    const data = JSON.parse(localStorage.getItem("history") || "{}");
-
-    if (!data[key]) data[key] = [];
-
-    const allNumbers = [...Array(number2)].map((_, i) => i + 1);
-    const used = data[key];
-    const remain = allNumbers.filter(n => !used.includes(n));
-
-    if (remain.length === 0) {
-        alert(`${grade}年${classroom}組はデータがいっぱいいっぱいです！`);
-        return;
+function undoLatestFor(key){
+  const data=readData();
+  if(!data.undos||data.undos.length===0) return false;
+  for(let i=data.undos.length-1;i>=0;i--){
+    const u=data.undos[i];
+    if(u.key===key){
+      if(data.dates&&data.dates[u.date]&&data.dates[u.date][u.key]){
+        const arr=data.dates[u.date][u.key];
+        const idx=arr.lastIndexOf(u.number);
+        if(idx!==-1) arr.splice(idx,1);
+        if(arr.length===0) delete data.dates[u.date][u.key];
+        if(Object.keys(data.dates[u.date]||{}).length===0) delete data.dates[u.date];
+      }
+      if(data.current&&data.current[u.key]){
+        const idx2=data.current[u.key].lastIndexOf(u.number);
+        if(idx2!==-1) data.current[u.key].splice(idx2,1);
+      }
+      data.undos.splice(i,1);
+      writeData(data);
+      return u.number;
     }
+  }
+  return false;
+}
 
-    const selected = remain[Math.floor(Math.random() * remain.length)];
-    used.push(selected);
-    data[key] = used;
-    localStorage.setItem("history", JSON.stringify(data));
+document.getElementById('lotteryForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const g=gradeSelect.value,c=classSelect.value,n=Number(numberInput.value)||40;
+  if(!g||!c) return alert('学年・クラスを選択してください');
+  if(n<1||n>MAX_NUMBER) return alert('人数範囲エラー');
 
-    const rouletteEl = document.getElementById("roulette");
-    const resultEl = document.getElementById("result");
+  clearInterval(spinInterval);clearTimeout(spinTimeout);
+  let cur=1;
+  rouletteEl.style.opacity='1'; rouletteEl.style.color='#111';
+  spinInterval=setInterval(()=>{cur=(cur%n)+1;rouletteEl.textContent=cur;},40);
 
-    let current = 1;
-    rouletteEl.style.opacity = "1";
-
-    const interval = setInterval(() => {
-        current = (current % number2) + 1;
-        rouletteEl.innerText = current;
-    }, 50);
-
-    setTimeout(() => {
-        clearInterval(interval);
-        rouletteEl.innerText = selected;
-        rouletteEl.style.color = "#c00";
-        resultEl.innerText = `結果: ${grade}年${classroom}組 ${selected}番`;
-        loadHistory();
-    }, 1500);
+  let sel=pickRandomNumber(g,c,n);
+  if(sel===null) sel=pickRandomNumber(g,c,n);
+  spinTimeout=setTimeout(()=>{
+    clearInterval(spinInterval);
+    rouletteEl.textContent=sel;
+    rouletteEl.style.color='#c00';
+    resultEl.textContent=`結果: ${g}年${c}組 ${sel}番`;
+    renderHistory();
+  },1200);
 });
 
-loadHistory();
+document.getElementById('undoBtn').addEventListener('click',()=>{
+  const g=gradeSelect.value,c=classSelect.value;
+  if(!g||!c) return alert('学年・クラスを選択');
+  const key=`${g}-${c}`,num=undoLatestFor(key);
+  if(num===false) return alert('戻せる履歴がありません');
+  showMessage(`${num}番を戻しました`); renderHistory();
+});
+document.getElementById('resetClassBtn').addEventListener('click',()=>{
+  const g=gradeSelect.value,c=classSelect.value;
+  if(!g||!c) return alert('学年・クラスを選択');
+  if(!confirm(`${g}年${c}組の履歴を削除しますか？`)) return;
+  const key=`${g}-${c}`,data=readData();
+  if(data.dates) Object.keys(data.dates).forEach(d=>{if(data.dates[d][key]) delete data.dates[d][key];if(Object.keys(data.dates[d]||{}).length===0) delete data.dates[d];});
+  if(data.current&&data.current[key]) delete data.current[key];
+  if(data.undos) data.undos=data.undos.filter(u=>u.key!==key);
+  writeData(data);showMessage('削除しました');renderHistory();populateClass();
+});
+document.getElementById('resetAllBtn').addEventListener('click',()=>{
+  if(!confirm('全履歴を削除しますか？')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  showMessage('全履歴を削除しました');
+  renderHistory();populateClass();
+});
+onlyHistoryCheckbox.addEventListener('change',()=>populateClass());
+gradeSelect.addEventListener('change',()=>populateClass());
+
+let spinInterval=null,spinTimeout=null;
+(function init(){populateGrade();populateClass();renderHistory();})();
+window.addEventListener('storage',()=>{populateClass();renderHistory();});
 </script>
 </body>
 </html>
+
